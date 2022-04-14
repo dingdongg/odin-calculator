@@ -1,3 +1,7 @@
+html, button {
+    font-family: 'Orbitron', sans-serif;
+}
+
 body {
     display: flex;
     justify-content: center;
