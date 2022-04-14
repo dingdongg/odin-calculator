@@ -113,6 +113,15 @@ function evalExpression() {
             }
         }
 
+        if (num1 === "???") {
+            expressionValues.length = 0;
+            DISPLAY_CONTAINER.textContent = num1;
+            displayValue = '';
+            isScreen = false;
+            numBuffer = '';
+            return;
+        }
+
         num1 = Number(num1.toFixed(3)); // round to 3 decimal places, if need be
 
         let valueParsed = num1.toString();
@@ -129,6 +138,10 @@ function evalExpression() {
         isScreenFull = false;
     } else {
         displayValue = "INVALID EXPR";
+        DISPLAY_CONTAINER.textContent = displayValue;
+        displayValue = '';
+        expressionValues.length = 0;
+        numBuffer = '';
     }
 }
 
