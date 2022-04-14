@@ -113,9 +113,11 @@ function evalExpression() {
             }
         }
 
+        num1 = Number(num1.toFixed(3)); // round to 3 decimal places, if need be
+
         let valueParsed = num1.toString();
         console.log('valueParsed = ' + valueParsed);
-        if (valueParsed.length > MAX_DISPLAY_LENGTH) {
+        if (valueParsed.length > MAX_DISPLAY_LENGTH) { // truncate display value if too long
             displayValue = valueParsed.slice(0, MAX_DISPLAY_LENGTH);
             isScreenFull = true;
         } else {
