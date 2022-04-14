@@ -21,6 +21,12 @@ body {
     border: 2px solid black;
     width: 470px;
     height: 20%;
+    text-align: right;
+    font-size: 85px;
+
+    /* allow users to scroll to see overflow text on display */
+    overflow: scroll;
+    overflow-y: hidden;
 }
 
 .keypad-container {

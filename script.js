@@ -1,3 +1,9 @@
+/**
+ * @TODO make calculator evaluate 1 pair of numbers at a time
+ * @TODO improve CSS of calculator 
+ */
+
+
 // GLOBAL VARIABLES
 let displayValue = "";
 let isScreenFull = false;
