@@ -1,5 +1,8 @@
 // GLOBAL VARIABLES
 let displayValue = "";
+let isScreenFull = false;
+let numBuffer = '';
+let expressionValues = [];
 
 const MAX_DISPLAY_LENGTH = 15;
 const DISPLAY_CONTAINER = document.querySelector(".display-container");
@@ -26,24 +29,21 @@ function multiply(num1, num2) {
 }
 
 function divide(num1, num2) {
+    if (num2 === 0) {
+        return "???";
+    }
     return num1 / num2;
 }
 
-// [12] [+] [7] [-] [5] [*] [3]
-
-// [12 + 7] - 5 * 3
-//     [19 - 5] * 3
-//         [14 * 3]
-//             [42]
 function operate(operator, num1, num2) {
     switch (operator) {
-        case "+":
+        case '+':
             return add(num1, num2);
-        case "-":
+        case '-':
             return subtract(num1, num2);
-        case "*":
+        case '*':
             return multiply(num1, num2);
-        case "/":
+        case '/':
             return divide(num1, num2);
         default:
             return "input one of the following: + - * /";        
@@ -55,6 +55,7 @@ function populateDisplay(keyInput) {
         displayValue += keyInput;
         if (displayValue.length > MAX_DISPLAY_LENGTH) {
             displayValue = displayValue.slice(0, MAX_DISPLAY_LENGTH);
+            isScreenFull = true;
         }
     }
 }
@@ -64,35 +65,85 @@ function updateDisplay() {
     DISPLAY_CONTAINER.textContent = displayValue;
 }
 
+function pushNumberQueue() {
+    numBuffer += this.textContent;
+}
+
+function pushOperandQueue() {
+    expressionValues.push(parseFloat(numBuffer));
+    expressionValues.push(this.textContent);
+    numBuffer = '';
+}
+
 function resetDisplay() {
     displayValue = '';
+    numBuffer = '';
     DISPLAY_CONTAINER.textContent = displayValue;
+    expressionValues.length = 0;
+    isScreenFull = false;
+}
+
+function isValidExpression() {
+    return !expressionValues.includes(NaN);
+}
+
+function evalExpression() {
+
+    expressionValues.push(parseInt(numBuffer));
+    numBuffer = '';
+    
+    if (isValidExpression()) {
+        
+        let num1;
+        let num2;
+        let operand;
+        let numStored = false;
+
+        for (let i = 0; i < expressionValues.length; i++) {
+            if (i % 2 === 0) { // number
+                if (numStored) {
+                    num2 = expressionValues[i];
+                    num1 = operate(operand, num1, num2);
+                } else {
+                    num1 = expressionValues[i];
+                    numStored = true;
+                }
+            } else { // operand
+                operand = expressionValues[i];
+            }
+        }
+
+        let valueParsed = num1.toString();
+        console.log('valueParsed = ' + valueParsed);
+        if (valueParsed.length > MAX_DISPLAY_LENGTH) {
+            displayValue = valueParsed.slice(0, MAX_DISPLAY_LENGTH);
+            isScreenFull = true;
+        } else {
+            displayValue = valueParsed;
+        }
+        expressionValues.length = 0;
+        DISPLAY_CONTAINER.textContent = displayValue;
+        numBuffer = valueParsed;
+        isScreenFull = false;
+    } else {
+        displayValue = "INVALID EXPR";
+    }
 }
 
 function hookUpButtons() {
-    NUMBER_KEYS.forEach(key => key.addEventListener('click', updateDisplay));
-    OPERAND_KEYS.forEach(key => key.addEventListener('click', updateDisplay));
+    NUMBER_KEYS.forEach(key => {
+        key.addEventListener('click', updateDisplay);
+        key.addEventListener('click', pushNumberQueue);
+    });
+    OPERAND_KEYS.forEach(key => {
+        key.addEventListener('click', updateDisplay);
+        key.addEventListener('click', pushOperandQueue);
+    });
     CLEAR_KEY.addEventListener('click', resetDisplay);
-    // add event listener for EQUALS_KEY to evaluate current expression
+    EQUALS_KEY.addEventListener('click', evalExpression);
 }
 
 hookUpButtons();
-
-
-
-/**
- * 1. when user presses a button, display should be updated 
- * 2. "correct" order should be: <digit> ... <digit> | <operand> <digit> ... <digit>
- * 3. when CLR pressed, clear the entire display
- * 4. when = is pressed, evaluate the expression on the display
- * 5. ORDER OF OPERATIONS IGNORED (FOR NOW)
- * 
- * - calculations always start with a number
- * - if operands are used, they MUST be followed by another number
- * - if number is too big to fit on display, it will be truncated (to MAX_DISPLAY_LENGTH digits)
- * - if equals pressed after a "correct" order of operations, evaluate the expression on screen 
- */
-
 
 
 // POINT OF EXECUTION
