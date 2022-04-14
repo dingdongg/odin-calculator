@@ -1,8 +1,11 @@
 /**
  * @TODO make calculator evaluate 1 pair of numbers at a time
  * @TODO improve CSS of calculator 
+ * @TODO bug where display doesn't work properly???
+ *      - when subtracting a large number from another number 
+ *      - while typing out the large number, display snaps back and can't scroll
+ * @TODO add decimal points, backspace, negation buttons
  */
-
 
 // GLOBAL VARIABLES
 let displayValue = "";
@@ -93,6 +96,10 @@ function isValidExpression() {
     return !expressionValues.includes(NaN);
 }
 
+
+/**
+ * @TODO change this to evaluate ONLY ONE PAIR OF NUMBERS at a time
+ */
 function evalExpression() {
 
     expressionValues.push(parseInt(numBuffer));
