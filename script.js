@@ -1,5 +1,4 @@
 /**
- * @TODO improve CSS of calculator 
  * @TODO add decimal points, backspace, negation buttons
  */
 
@@ -112,9 +111,11 @@ function clearDisplay() {
     state = STATE_CLEAR;
 }
 
-/**
- * @TODO change this to evaluate ONLY ONE PAIR OF NUMBERS at a time
- */
+function roundNumber(num, decimalPlaces) {
+    const roundingNum = Math.pow(10, decimalPlaces);
+    return Math.round(num * roundingNum) / roundingNum;
+}
+
 function evalExpression() {
     if (state % 2 === 0) {
         displayInvalid();
@@ -126,17 +127,14 @@ function evalExpression() {
             displayInvalid(value);
             return;
         } else {
-            const roundingNum = Math.pow(10, DECIMAL_PLACES);
-            value = Math.round(value * roundingNum) / roundingNum;
-            // update display
+            value = roundNumber(value, DECIMAL_PLACES);
             displayValue = value.toString();
             DISPLAY_CONTAINER.textContent = displayValue;
             expressionValues = [];
             numBuffer = value.toString();
             state = STATE_ONE_NUM;
-            // reset everything except display
         }
-    }
+    }   
 }
 
 function hookUpButtons() {
@@ -153,6 +151,3 @@ function hookUpButtons() {
 }
 
 hookUpButtons();
-
-
-// POINT OF EXECUTION
