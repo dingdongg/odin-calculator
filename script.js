@@ -1,9 +1,4 @@
 /**
- * @TODO make calculator evaluate 1 pair of numbers at a time
- *          - evalutes the ENTIRE expression entered w/o considering BEDMAS (currently)
- *          - operator buttons must also be ready to evaluate 
- *              - ex) [12 + 7 - ] ==> [19 - ]
- *              - expressionValues array can be of length 4 MAX at any given moment (0 - 4)
  * @TODO improve CSS of calculator 
  * @TODO bug where display doesn't work properly???
  *      - when subtracting a large number from another number 
@@ -13,12 +8,24 @@
 
 // GLOBAL VARIABLES
 let displayValue = "";
-let isScreenFull = false;
-let firstOperatorSet = false;
 let numBuffer = '';
 let expressionValues = [];
 
+/**
+ * STATE  0: nothing inputted (cleared)
+ * STATE  1: 1 operand 
+ * STATE  2: 1 operand, 1 operator
+ * STATE  3: 1 full expression
+ */
+const STATE_CLEAR = 0;
+const STATE_ONE_NUM = 1;
+const STATE_ONE_NUM_OPR = 2;
+const STATE_ONE_EXPR = 3;
+let state = STATE_CLEAR;
+
+const DECIMAL_PLACES = 3;
 const MAX_DISPLAY_LENGTH = 15;
+
 const DISPLAY_CONTAINER = document.querySelector(".display-container");
 const KEYPAD_CONTAINER = document.querySelector(".keypad-container");
 
@@ -43,10 +50,7 @@ function multiply(num1, num2) {
 }
 
 function divide(num1, num2) {
-    if (num2 === 0) {
-        return "???";
-    }
-    return num1 / num2;
+    return ((num2 === 0) ? "???" : num1 / num2);
 }
 
 function operate(operator, num1, num2) {
@@ -69,7 +73,6 @@ function appendDisplayValue(keyInput) {
         displayValue += keyInput;
         if (displayValue.length > MAX_DISPLAY_LENGTH) {
             displayValue = displayValue.slice(0, MAX_DISPLAY_LENGTH);
-            isScreenFull = true;
         }
     }
 }
@@ -79,100 +82,82 @@ function updateDisplay() {
     DISPLAY_CONTAINER.textContent = displayValue;
 }
 
-function pushNumberQueue() {
+function buildNumber() {
+    if (state % 2 === 0) state++; // if state was CLEAR or ONE_NUM_OPR, goto ONE_NUM/ONE_EXPR, respectively
     numBuffer += this.textContent;
 }
 
-function pushOperandQueue() {
-    expressionValues.push(parseFloat(numBuffer));
-    expressionValues.push(this.textContent);
-    firstOperatorSet = true;
+function displayInvalid(errorMessage = 'INVALID') {
+    displayValue = errorMessage;
+    DISPLAY_CONTAINER.textContent = displayValue;
+    displayValue = '';
+    expressionValues = [];
     numBuffer = '';
+    state = STATE_CLEAR;
 }
 
-function resetDisplay() {
+function pushOperator() {    
+    if (state % 2 === 0) {
+        displayInvalid();
+        return;
+    } else {
+        if (state === STATE_ONE_EXPR) {
+            evalExpression();
+            appendDisplayValue(this.textContent);
+            DISPLAY_CONTAINER.textContent = displayValue;
+        }
+        expressionValues.push(parseFloat(numBuffer));
+        expressionValues.push(this.textContent);
+        state = STATE_ONE_NUM_OPR;
+        numBuffer = '';
+    }
+}
+
+function clearDisplay() {
     displayValue = '';
     numBuffer = '';
     DISPLAY_CONTAINER.textContent = displayValue;
     expressionValues.length = 0;
-    isScreenFull = false;
-}
-
-function isValidExpression() {
-    return !expressionValues.includes(NaN);
+    state = STATE_CLEAR;
 }
 
 /**
  * @TODO change this to evaluate ONLY ONE PAIR OF NUMBERS at a time
  */
 function evalExpression() {
-
-    expressionValues.push(parseInt(numBuffer));
-    numBuffer = '';
-    
-    if (isValidExpression()) {
-        
-        let num1;
-        let num2;
-        let operand;
-        let numStored = false;
-
-        for (let i = 0; i < expressionValues.length; i++) {
-            if (i % 2 === 0) { // number
-                if (numStored) {
-                    num2 = expressionValues[i];
-                    num1 = operate(operand, num1, num2);
-                } else {
-                    num1 = expressionValues[i];
-                    numStored = true;
-                }
-            } else { // operand
-                operand = expressionValues[i];
-            }
-        }
-
-        if (num1 === "???") {
-            expressionValues.length = 0;
-            DISPLAY_CONTAINER.textContent = num1;
-            displayValue = '';
-            isScreen = false;
-            numBuffer = '';
+    if (state % 2 === 0) {
+        displayInvalid();
+        return;
+    } else if (state === STATE_ONE_EXPR) {
+        expressionValues.push(parseFloat(numBuffer));
+        let value = operate(expressionValues[1], expressionValues[0], expressionValues[2]);
+        if (value === "???") {
+            displayInvalid(value);
             return;
-        }
-
-        num1 = Number(num1.toFixed(3)); // round to 3 decimal places, if need be
-
-        let valueParsed = num1.toString();
-        console.log('valueParsed = ' + valueParsed);
-        if (valueParsed.length > MAX_DISPLAY_LENGTH) { // truncate display value if too long
-            displayValue = valueParsed.slice(0, MAX_DISPLAY_LENGTH);
-            isScreenFull = true;
         } else {
-            displayValue = valueParsed;
+            const roundingNum = Math.pow(10, DECIMAL_PLACES);
+            value = Math.round(value * roundingNum) / roundingNum;
+            // update display
+            displayValue = value.toString();
+            DISPLAY_CONTAINER.textContent = displayValue;
+            expressionValues = [];
+            numBuffer = value.toString();
+            state = STATE_ONE_NUM;
+            // reset everything except display
         }
-        expressionValues.length = 0;
-        DISPLAY_CONTAINER.textContent = displayValue;
-        numBuffer = valueParsed;
-        isScreenFull = false;
-    } else {
-        displayValue = "INVALID EXPR";
-        DISPLAY_CONTAINER.textContent = displayValue;
-        displayValue = '';
-        expressionValues.length = 0;
-        numBuffer = '';
     }
 }
 
 function hookUpButtons() {
     NUMBER_KEYS.forEach(key => {
         key.addEventListener('click', updateDisplay);
-        key.addEventListener('click', pushNumberQueue);
+        key.addEventListener('click', buildNumber);
     });
     OPERAND_KEYS.forEach(key => {
         key.addEventListener('click', updateDisplay);
-        key.addEventListener('click', pushOperandQueue);
+        key.addEventListener('click', pushOperator);
     });
-    CLEAR_KEY.addEventListener('click', resetDisplay);
+    CLEAR_KEY.addEventListener('click', clearDisplay);
     EQUALS_KEY.addEventListener('click', evalExpression);
 }
 
