@@ -1,5 +1,9 @@
 /**
  * @TODO make calculator evaluate 1 pair of numbers at a time
+ *          - evalutes the ENTIRE expression entered w/o considering BEDMAS (currently)
+ *          - operator buttons must also be ready to evaluate 
+ *              - ex) [12 + 7 - ] ==> [19 - ]
+ *              - expressionValues array can be of length 4 MAX at any given moment (0 - 4)
  * @TODO improve CSS of calculator 
  * @TODO bug where display doesn't work properly???
  *      - when subtracting a large number from another number 
@@ -10,6 +14,7 @@
 // GLOBAL VARIABLES
 let displayValue = "";
 let isScreenFull = false;
+let firstOperatorSet = false;
 let numBuffer = '';
 let expressionValues = [];
 
@@ -59,7 +64,7 @@ function operate(operator, num1, num2) {
     }
 }
 
-function populateDisplay(keyInput) {
+function appendDisplayValue(keyInput) {
     if (displayValue.length < MAX_DISPLAY_LENGTH) {
         displayValue += keyInput;
         if (displayValue.length > MAX_DISPLAY_LENGTH) {
@@ -70,7 +75,7 @@ function populateDisplay(keyInput) {
 }
 
 function updateDisplay() {
-    populateDisplay(this.textContent);
+    appendDisplayValue(this.textContent);
     DISPLAY_CONTAINER.textContent = displayValue;
 }
 
@@ -81,6 +86,7 @@ function pushNumberQueue() {
 function pushOperandQueue() {
     expressionValues.push(parseFloat(numBuffer));
     expressionValues.push(this.textContent);
+    firstOperatorSet = true;
     numBuffer = '';
 }
 
@@ -95,7 +101,6 @@ function resetDisplay() {
 function isValidExpression() {
     return !expressionValues.includes(NaN);
 }
-
 
 /**
  * @TODO change this to evaluate ONLY ONE PAIR OF NUMBERS at a time
