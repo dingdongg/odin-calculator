@@ -1,27 +1,18 @@
 /**
  * @TODO improve CSS of calculator 
- * @TODO bug where display doesn't work properly???
- *      - when subtracting a large number from another number 
- *      - while typing out the large number, display snaps back and can't scroll
  * @TODO add decimal points, backspace, negation buttons
  */
 
 // GLOBAL VARIABLES
-let displayValue = "";
-let numBuffer = '';
-let expressionValues = [];
-
-/**
- * STATE  0: nothing inputted (cleared)
- * STATE  1: 1 operand 
- * STATE  2: 1 operand, 1 operator
- * STATE  3: 1 full expression
- */
-const STATE_CLEAR = 0;
-const STATE_ONE_NUM = 1;
-const STATE_ONE_NUM_OPR = 2;
-const STATE_ONE_EXPR = 3;
+const STATE_CLEAR = 0;          // nothing inputted
+const STATE_ONE_NUM = 1;        // 1 operand
+const STATE_ONE_NUM_OPR = 2;    // 1 operand, 1 operator
+const STATE_ONE_EXPR = 3;       // 1 full expression
 let state = STATE_CLEAR;
+
+let displayValue = "";          // value on calculator's display
+let numBuffer = '';             // buffer to build up a number
+let expressionValues = [];      // buffer to build up an expression
 
 const DECIMAL_PLACES = 3;
 const MAX_DISPLAY_LENGTH = 15;
