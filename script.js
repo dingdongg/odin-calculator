@@ -14,7 +14,7 @@ let numBuffer = '';             // buffer to build up a number
 let expressionValues = [];      // buffer to build up an expression
 
 const DECIMAL_PLACES = 3;
-const MAX_DISPLAY_LENGTH = 15;
+const MAX_DISPLAY_LENGTH = 10;
 
 const DISPLAY_CONTAINER = document.querySelector(".display-container");
 const KEYPAD_CONTAINER = document.querySelector(".keypad-container");
@@ -67,14 +67,15 @@ function appendDisplayValue(keyInput) {
     }
 }
 
-function updateDisplay() {
-    appendDisplayValue(this.textContent);
+function updateDisplay(character) {
+    appendDisplayValue(character);
     DISPLAY_CONTAINER.textContent = displayValue;
 }
 
 function buildNumber() {
     if (state % 2 === 0) state++; // if state was CLEAR or ONE_NUM_OPR, goto ONE_NUM/ONE_EXPR, respectively
     numBuffer += this.textContent;
+    updateDisplay(this.textContent);
 }
 
 function displayInvalid(errorMessage = 'INVALID') {
@@ -87,15 +88,14 @@ function displayInvalid(errorMessage = 'INVALID') {
 }
 
 function pushOperator() {    
-    if (state % 2 === 0) {
+    if (state % 2 === 0) { // if state was CLEAR or ONE_NUM_OPR, display error message
         displayInvalid();
         return;
     } else {
         if (state === STATE_ONE_EXPR) {
             evalExpression();
-            appendDisplayValue(this.textContent);
-            DISPLAY_CONTAINER.textContent = displayValue;
         }
+        updateDisplay(this.textContent);
         expressionValues.push(parseFloat(numBuffer));
         expressionValues.push(this.textContent);
         state = STATE_ONE_NUM_OPR;
@@ -139,11 +139,9 @@ function evalExpression() {
 
 function hookUpButtons() {
     NUMBER_KEYS.forEach(key => {
-        key.addEventListener('click', updateDisplay);
         key.addEventListener('click', buildNumber);
     });
     OPERAND_KEYS.forEach(key => {
-        key.addEventListener('click', updateDisplay);
         key.addEventListener('click', pushOperator);
     });
     CLEAR_KEY.addEventListener('click', clearDisplay);

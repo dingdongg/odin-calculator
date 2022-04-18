@@ -1,5 +1,5 @@
 html, button {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Orbitron', monospace;
 }
 
 body {
@@ -31,8 +31,8 @@ body {
     border-radius: 5px;
 
     /* allow users to scroll to see overflow text on display */
-    overflow: scroll;
-    overflow-y: hidden;
+    /* overflow: scroll;
+    overflow-y: hidden; */
 }
 
 .keypad-container {
