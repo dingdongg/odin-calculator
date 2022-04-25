@@ -13,6 +13,7 @@ let displayValue = "";          // value on calculator's display
 let numBuffer = '';             // buffer to build up a number
 let expressionValues = [];      // buffer to build up an expression
 let decimalUsed = false;        // to prevent using decimal twice for the same number
+let negationIndex = 0;
 
 const DECIMAL_PLACES = 3;
 const MAX_DISPLAY_LENGTH = 10;
@@ -73,6 +74,11 @@ function appendDisplayValue(keyInput) {
 
 function updateDisplay(character) {
     appendDisplayValue(character);
+    DISPLAY_CONTAINER.textContent = displayValue;
+}
+
+function updateDisplayHard(str) {
+    displayValue = str;
     DISPLAY_CONTAINER.textContent = displayValue;
 }
 
@@ -143,13 +149,14 @@ function evalExpression() {
 }
 
 /**
- * negates the value of the current number and updates the display.
+ * adds a decimal to the current number, if and only if the decimal has not been added already.
  */
 function addDecimal() {
     if (state % 2 === 0) {
         updateDisplay(this.textContent);
         numBuffer += '0.';
         decimalUsed = true;
+        state++;
     } else {
         if (!decimalUsed) {
             updateDisplay(this.textContent);
@@ -161,8 +168,24 @@ function addDecimal() {
     }
 }
 
-function negateNumber() {
 
+/**
+ * negates the value of the current number and updates the display.
+ * positive -> negative, and vice versa; does nothing if number is 0.
+ */
+function negateNumber() {
+    if (state % 2 === 1) {
+        if (numBuffer === '') {
+            return;
+        } else if (numBuffer[0] === '-') {
+            numBuffer = numBuffer.slice(1); // remove the negation sign
+        } else if (numBuffer !== '-') {
+            numBuffer = '-' + numBuffer;
+        }
+
+        if (state === 1) updateDisplayHard(numBuffer);
+        else if (state === 3) updateDisplayHard(expressionValues[0] + expressionValues[1] + numBuffer);
+    }
 }
 
 function deleteChar() {
@@ -181,7 +204,6 @@ function hookUpButtons() {
     /**
      * @TODO function for delete key 
      * @TODO function for negation key 
-     * @TODO function for decimal key
      */
     NEGATE_KEY.addEventListener('click', negateNumber);
     DECIMAL_KEY.addEventListener('click', addDecimal);
