@@ -24,6 +24,9 @@ const NUMBER_KEYS = document.querySelectorAll(".number");
 const OPERAND_KEYS = document.querySelectorAll('.operand');
 const EQUALS_KEY = document.querySelector('.evaluate');
 const CLEAR_KEY = document.querySelector('.clear');
+const NEGATE_KEY = document.querySelector('.negate');
+const DEL_KEY = document.querySelector('.delete');
+const DECIMAL_KEY = document.querySelector('.decimal');
 
 
 // FUNCTIONS
