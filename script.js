@@ -12,6 +12,7 @@ let decimalUsed = false;        // to prevent using decimal twice for the same n
 
 const DECIMAL_PLACES = 3;
 const MAX_DISPLAY_LENGTH = 10;
+let maxNum;
 
 const DISPLAY_CONTAINER = document.querySelector(".display-container");
 const KEYPAD_CONTAINER = document.querySelector(".keypad-container");
@@ -27,6 +28,10 @@ const DECIMAL_KEY = document.querySelector('.decimal');
 
 
 // FUNCTIONS
+function computeMaxLimit() {
+    maxNum = '9'.repeat(MAX_DISPLAY_LENGTH);
+}
+
 function add(num1, num2) {
     return num1 + num2;
 }
@@ -134,11 +139,18 @@ function evalExpression() {
             return;
         } else {
             value = roundNumber(value, DECIMAL_PLACES);
-            displayValue = value.toString();
-            DISPLAY_CONTAINER.textContent = displayValue;
-            expressionValues = [];
-            numBuffer = value.toString();
-            state = STATE_ONE_NUM;
+            if (value > maxNum) {
+                displayInvalid("OVERFLOW");
+                expressionValues = [];
+                numBuffer = '';
+                state = STATE_CLEAR;
+            } else {
+                displayValue = value.toString();
+                DISPLAY_CONTAINER.textContent = displayValue;
+                expressionValues = [];
+                numBuffer = value.toString();
+                state = STATE_ONE_NUM;
+            }
         }
     }   
 }
@@ -203,6 +215,7 @@ function deleteChar() {
 }
 
 function hookUpButtons() {
+    computeMaxLimit();
     NUMBER_KEYS.forEach(key => {
         key.addEventListener('click', buildNumber);
     });
