@@ -15,6 +15,7 @@ Check it out [here](https://dingdongg.github.io/odin-calculator/)!
 There's a couple of things that I want to edit:
 - Documenting my functions 
 - Implementing keyboard support (not just mouse)
+- Make negations combined with operators look more "visually pleasing"
 
 ## Credits
 
