@@ -40,7 +40,7 @@ body {
     width: 470px;
     height: 65%;
     display: grid;
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(5, auto);
     grid-template-rows:repeat(4, auto);
     gap: 15px;
 
@@ -56,6 +56,10 @@ body {
 
 button:active {
     transform: translateY(4px);
+}
+
+.evaluate {
+    grid-column: 4 / 6;
 }
 
 .operand {
