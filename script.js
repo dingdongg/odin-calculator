@@ -1,7 +1,3 @@
-/**
- * @TODO add decimal points, backspace, negation buttons
- */
-
 // GLOBAL VARIABLES
 const STATE_CLEAR = 0;          // nothing inputted
 const STATE_ONE_NUM = 1;        // 1 operand
@@ -13,7 +9,6 @@ let displayValue = "";          // value on calculator's display
 let numBuffer = '';             // buffer to build up a number
 let expressionValues = [];      // buffer to build up an expression
 let decimalUsed = false;        // to prevent using decimal twice for the same number
-let negationIndex = 0;
 
 const DECIMAL_PLACES = 3;
 const MAX_DISPLAY_LENGTH = 10;
@@ -188,8 +183,23 @@ function negateNumber() {
     }
 }
 
+/**
+ * deletes a character from display and numBuffer (if not empty)
+ */
 function deleteChar() {
+    if (state !== STATE_CLEAR) {
+        let lastChar = displayValue.slice(-1);
+        displayValue = displayValue.slice(0, displayValue.length - 1);
+        updateDisplayHard(displayValue);
 
+        if (lastChar.match('[+]|[-]|[*]|[/]') !== null) { // lastChar is operand
+            // ...
+            state--;
+        } else if (lastChar.match('[.]') === ['.']) {
+            decimalUsed = false;
+        } 
+        if (numBuffer !== '') numBuffer = numBuffer.slice(0, numBuffer.length - 1);
+    }
 }
 
 function hookUpButtons() {
@@ -201,10 +211,7 @@ function hookUpButtons() {
     });
     CLEAR_KEY.addEventListener('click', clearDisplay);
     EQUALS_KEY.addEventListener('click', evalExpression);
-    /**
-     * @TODO function for delete key 
-     * @TODO function for negation key 
-     */
+    
     NEGATE_KEY.addEventListener('click', negateNumber);
     DECIMAL_KEY.addEventListener('click', addDecimal);
     DEL_KEY.addEventListener('click', deleteChar);
