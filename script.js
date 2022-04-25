@@ -12,6 +12,7 @@ let state = STATE_CLEAR;
 let displayValue = "";          // value on calculator's display
 let numBuffer = '';             // buffer to build up a number
 let expressionValues = [];      // buffer to build up an expression
+let decimalUsed = false;        // to prevent using decimal twice for the same number
 
 const DECIMAL_PLACES = 3;
 const MAX_DISPLAY_LENGTH = 10;
@@ -109,6 +110,7 @@ function pushOperator() {
 function clearDisplay() {
     displayValue = '';
     numBuffer = '';
+    decimalUsed = false;
     DISPLAY_CONTAINER.textContent = displayValue;
     expressionValues.length = 0;
     state = STATE_CLEAR;
@@ -142,15 +144,24 @@ function evalExpression() {
 
 /**
  * negates the value of the current number and updates the display.
- * Clicking decimal as the first character of an operand inserts "0."
  */
-function negateNumber() {
+function addDecimal() {
     if (state % 2 === 0) {
-        
+        updateDisplay(this.textContent);
+        numBuffer += '0.';
+        decimalUsed = true;
+    } else {
+        if (!decimalUsed) {
+            updateDisplay(this.textContent);
+            numBuffer += '.';
+            decimalUsed = true;
+        } else {
+            // error message? not sure yet ...
+        }
     }
 }
 
-function addDecimal() {
+function negateNumber() {
 
 }
 
