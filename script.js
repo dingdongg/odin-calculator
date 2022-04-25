@@ -140,6 +140,24 @@ function evalExpression() {
     }   
 }
 
+/**
+ * negates the value of the current number and updates the display.
+ * Clicking decimal as the first character of an operand inserts "0."
+ */
+function negateNumber() {
+    if (state % 2 === 0) {
+        
+    }
+}
+
+function addDecimal() {
+
+}
+
+function deleteChar() {
+
+}
+
 function hookUpButtons() {
     NUMBER_KEYS.forEach(key => {
         key.addEventListener('click', buildNumber);
@@ -149,6 +167,14 @@ function hookUpButtons() {
     });
     CLEAR_KEY.addEventListener('click', clearDisplay);
     EQUALS_KEY.addEventListener('click', evalExpression);
+    /**
+     * @TODO function for delete key 
+     * @TODO function for negation key 
+     * @TODO function for decimal key
+     */
+    NEGATE_KEY.addEventListener('click', negateNumber);
+    DECIMAL_KEY.addEventListener('click', addDecimal);
+    DEL_KEY.addEventListener('click', deleteChar);
 }
 
 hookUpButtons();
