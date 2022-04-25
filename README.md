@@ -8,7 +8,7 @@ handles number overflow on the calculator's screen, as well as zero division err
 
 ## Link to website
 
-To be added soon.
+Check it out [here](https://dingdongg.github.io/odin-calculator/)!
 
 ## Future ideas
 
